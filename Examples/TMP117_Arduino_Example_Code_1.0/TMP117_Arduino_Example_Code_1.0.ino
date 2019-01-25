@@ -4,6 +4,8 @@
  */
 
 
+// address pin is connected to ground --> 0x48
+
  #include "TMP117.h"
 
  TMP117 t(0x48);
@@ -18,7 +20,11 @@
 /************************* Infinite Loop Function **********************************/
  void loop(){
  
-  Serial.println(t.getTemperature());
+  //Serial.println(t.getTemperature());
 
-  delay(100);
+  Serial.print("Device ID : ");
+  Serial.print (t.getDeviceID());
+  Serial.print("  Revision : ");
+  Serial.println (t.getDeviceRev());
+  delay(1000);
  }

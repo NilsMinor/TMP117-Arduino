@@ -29,7 +29,11 @@
 #define TMP117_REG_TEMPERATURE_OFFSET   0x07
 #define TMP117_REG_DEVICE_ID            0x0F
 
+#define TMP117_RESOLUTION               (double)0.0078125
 
+typedef void (*allert_callback)(void);
+
+enum TMP117_Mode {Thermal, Alert}; 
 
 class TMP117 {
   public:
@@ -39,18 +43,23 @@ class TMP117 {
     uint16_t  getDeviceRev (void);
     void      writeEEPROM (uint16_t data, uint8_t eeprom);
     uint16_t  readEEPROM (uint8_t eeprom);
+    void      setAllert (void (*allert_callback)(void), uint8_t pin);
+    void      setAllertTemperature (double lowtemp, double hightemp);
+    uint16_t  readConfig (void);
+    void      setMode ( TMP117_Mode mode);
 
   private:
+    void      writeConfig (uint16_t config_data);
     uint8_t   address;
+    int8_t    allert_pin;
+    
     double    calcTemperature (uint16_t raw);
     void      i2cWrite2B (uint8_t reg, uint16_t data);
     uint16_t  i2cRead2B (uint8_t reg);
     void      lockEEPROM (void);
     void      unlockEEPROM (void);
     bool      EEPROMisBusy (void);
-    
-    
-  
+      
 };
 
 

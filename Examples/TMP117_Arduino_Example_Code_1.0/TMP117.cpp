@@ -5,11 +5,60 @@
 TMP117::TMP117 (uint8_t addr) {
   
   address = addr;
+  allert_pin = -1;
   //Wire.begin();
 }
 
+void TMP117::setAllert (void (*allert_callback)(void), uint8_t pin) {
+  allert_pin = pin;
+  pinMode(pin, INPUT_PULLUP);
+  
+  attachInterrupt(digitalPinToInterrupt(pin), allert_callback, CHANGE); // Sets up pin 2 to trigger "alert" ISR when pin changes H->L and L->H
+}
+
+void TMP117::setAllertTemperature (double lowtemp, double hightemp) {
+   // Set temperature threshold 
+ const uint8_t highlimH = B00001101;   // High byte of high lim
+ const uint8_t highlimL = B10000000;   // Low byte of high lim  - High 27 C
+ const uint8_t lowlimH = B00001100;    // High byte of low lim
+ const uint8_t lowlimL = B00000000;    // Low byte of low lim   - Low 24 C
 
 
+ //uint16_t ht = ((highlimH << 8) | highlimL);
+ //uint16_t lt = ((lowlimH << 8) | lowlimL);
+
+ uint16_t high_temp_value = hightemp / TMP117_RESOLUTION;
+ uint16_t low_temp_value = lowtemp / TMP117_RESOLUTION;
+
+ i2cWrite2B (TMP117_REG_TEMP_HIGH_LIMIT , high_temp_value);
+ i2cWrite2B (TMP117_REG_TEMP_LOW_LIMIT , low_temp_value);  
+}
+
+uint16_t TMP117::readConfig (void) {
+  uint16_t reg_value = i2cRead2B ( TMP117_REG_CONFIGURATION );
+  bool high_alert = reg_value >> 15 & 1UL;
+  bool low_alert = reg_value >> 14 & 1UL;   
+  bool data_ready =  reg_value >> 13 & 1UL;   
+  bool eeprom_busy =  reg_value >> 12 & 1UL;   
+
+  if (data_ready)
+    Serial.println(reg_value, BIN);
+  return reg_value;  
+}
+
+void TMP117::writeConfig (uint16_t config_data) {
+  i2cWrite2B (TMP117_REG_CONFIGURATION, config_data);
+}
+void TMP117::setMode ( TMP117_Mode mode) {
+  uint16_t old_config = readConfig ();
+  if (mode == Thermal) {
+    old_config |= 1UL << 4;
+  }
+  else if (mode == Alert) {
+    old_config &= ~(1UL << 4);
+  } 
+  writeConfig ( old_config );
+}
 
 void TMP117::i2cWrite2B (uint8_t reg, uint16_t data){
   Wire.beginTransmission(address); 
@@ -39,7 +88,7 @@ uint16_t TMP117::i2cRead2B (uint8_t reg) {
 }
 
 double TMP117::calcTemperature (uint16_t raw) {
-  return raw * 0.0078125;
+  return raw * TMP117_RESOLUTION;
 }
 
 double TMP117::getTemperature (void) {

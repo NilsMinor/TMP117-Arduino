@@ -24,7 +24,7 @@ void setup() {
 /************************* Infinite Loop Function **********************************/
 void loop() {
 
-  //Serial.println(t.getTemperature());
+  Serial.println(t.getTemperature());
   t.readConfig();
   /*
     Serial.print("Device ID : ");

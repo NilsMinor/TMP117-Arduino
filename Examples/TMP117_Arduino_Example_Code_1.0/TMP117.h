@@ -33,7 +33,10 @@
 
 typedef void (*allert_callback)(void);
 
-enum TMP117_Mode {Thermal, Alert}; 
+enum TMP117_MODE      {Thermal, Alert, Data};
+enum TMP117_CMODE     {Continuous = 0, Shutdown, OneShot };
+enum TMP117_CONVT     {C15mS5 = 0, C125mS, C250mS, CONV500mS, CONV1S, C4S, C8S, C16S};
+enum TMP117_AVE       {NOAVE = 0, AVE8, AVE32, AVE64};
 
 class TMP117 {
   public:
@@ -46,7 +49,10 @@ class TMP117 {
     void      setAllert (void (*allert_callback)(void), uint8_t pin);
     void      setAllertTemperature (double lowtemp, double hightemp);
     uint16_t  readConfig (void);
-    void      setMode ( TMP117_Mode mode);
+    void      setMode ( TMP117_MODE mode);
+    void      setConvMode ( TMP117_CMODE cmode);
+    void      setConvTime ( TMP117_CONVT convtime );
+    void      setAveraging ( TMP117_AVE ave );
 
   private:
     void      writeConfig (uint16_t config_data);

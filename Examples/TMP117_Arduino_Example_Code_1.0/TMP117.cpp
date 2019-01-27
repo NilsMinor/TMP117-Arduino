@@ -12,6 +12,8 @@ TMP117::TMP117 (uint8_t addr) {
 void TMP117::setAllert (void (*allert_callback)(void), uint8_t pin) {
   allert_pin = pin;
   pinMode(pin, INPUT_PULLUP);
+  setConvMode (OneShot);
+  //setMode (Data);
   
   attachInterrupt(digitalPinToInterrupt(pin), allert_callback, CHANGE); // Sets up pin 2 to trigger "alert" ISR when pin changes H->L and L->H
 }
@@ -24,8 +26,8 @@ void TMP117::setAllertTemperature (double lowtemp, double hightemp) {
  const uint8_t lowlimL = B00000000;    // Low byte of low lim   - Low 24 C
 
 
- //uint16_t ht = ((highlimH << 8) | highlimL);
- //uint16_t lt = ((lowlimH << 8) | lowlimL);
+ //uint16_t high_temp_value = ((highlimH << 8) | highlimL);
+ //uint16_t low_temp_value = ((lowlimH << 8) | lowlimL);
 
  uint16_t high_temp_value = hightemp / TMP117_RESOLUTION;
  uint16_t low_temp_value = lowtemp / TMP117_RESOLUTION;
@@ -46,18 +48,50 @@ uint16_t TMP117::readConfig (void) {
   return reg_value;  
 }
 
+void TMP117::setConvMode ( TMP117_CMODE cmode) {
+   uint16_t reg_value = readConfig ();
+  
+   if (cmode == Continuous) {      // Bit [11:10] = 00
+      reg_value &= ~(1UL << 11); 
+      reg_value &= ~(1UL << 10);
+   } else if (cmode == Shutdown) { // Bit [11:10] = 01
+      reg_value &= ~(1UL << 11);
+      reg_value |= 1UL << 10;
+   } else if (cmode == OneShot) {  // Bit [11:10] = 11  
+      //reg_value |= 1UL << 11;
+      //reg_value |= 1UL << 10;
+      bitSet (reg_value , 11);
+      bitSet (reg_value , 10);
+   }
+   
+   writeConfig ( reg_value );
+}
+void TMP117::setConvTime ( TMP117_CONVT convtime ) {
+  
+}
+void TMP117::setAveraging ( TMP117_AVE ave ) {
+  
+}
+
 void TMP117::writeConfig (uint16_t config_data) {
   i2cWrite2B (TMP117_REG_CONFIGURATION, config_data);
 }
-void TMP117::setMode ( TMP117_Mode mode) {
-  uint16_t old_config = readConfig ();
+void TMP117::setMode ( TMP117_MODE mode) {
+  uint16_t reg_value = readConfig ();
   if (mode == Thermal) {
-    old_config |= 1UL << 4;
+    reg_value |= 1UL << 4;    // change to thermal mode
+    reg_value &= ~(1UL << 2); // set pin as alert flag
+    reg_value &= ~(1UL << 3); // alert pin low active
   }
   else if (mode == Alert) {
-    old_config &= ~(1UL << 4);
+    reg_value &= ~(1UL << 4); // change to alert mode
+    reg_value &= ~(1UL << 2); // set pin as alert flag
+    reg_value &= ~(1UL << 3); // alert pin low active
   } 
-  writeConfig ( old_config );
+  else if (mode == Data) {
+    reg_value |= 1UL << 2;    // set pin as data ready flag
+  } 
+  writeConfig ( reg_value );
 }
 
 void TMP117::i2cWrite2B (uint8_t reg, uint16_t data){

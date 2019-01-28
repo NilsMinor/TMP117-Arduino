@@ -19,6 +19,7 @@ void setup() {
   t.setAllert ( temperature_allert, 6);
   t.setAllertTemperature (24, 30);
   
+  
 }
 
 /************************* Infinite Loop Function **********************************/

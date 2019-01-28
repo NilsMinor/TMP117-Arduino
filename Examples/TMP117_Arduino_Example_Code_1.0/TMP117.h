@@ -66,7 +66,7 @@ class TMP117 {
     void      setAllert (void (*allert_callback)(void), uint8_t pin);
     void      setAllertTemperature (double lowtemp, double hightemp);
     uint16_t  readConfig (void);
-    void      setMode ( TMP117_MODE mode);
+    void      setAlertMode ( TMP117_MODE mode);
     void      setConvMode ( TMP117_CMODE cmode);
     void      setConvTime ( TMP117_CONVT convtime );
     void      setAveraging ( TMP117_AVE ave );

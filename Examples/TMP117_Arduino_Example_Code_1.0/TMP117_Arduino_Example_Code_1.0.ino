@@ -19,9 +19,9 @@ void setup() {
   Serial.begin(115200);
   pinMode (13, OUTPUT); 
 
-  t.setAllert ( temperature_allert, 6);
+  t.setAllert ( temperature_allert, 7);
   t.setAllertTemperature (24, 28);
- // t.init ( new_temperature );
+  t.init ( new_temperature );
 }
 
 /************************* Infinite Loop Function **********************************/
@@ -30,11 +30,10 @@ void loop() {
   //Serial.println(t.getTemperature());
   t.readConfig();
   delay(100);
-  
 }
 
 void new_temperature ( void ) {
-  digitalWrite (13, HIGH);
+  //digitalWrite (13, HIGH);
   Serial.print ("Temperature : ");
   Serial.print (t.getTemperature());
   Serial.println (" °C");
@@ -43,6 +42,8 @@ void new_temperature ( void ) {
 }
 
 void temperature_allert (void) {
+  Serial.println ("ALERT");
+
   if (t.getAlertType () == HighTempAlert) {
     digitalWrite (13, HIGH);
     Serial.print ("High Temperature allert : ");

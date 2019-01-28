@@ -13,6 +13,7 @@ void TMP117::init ( void (*_newDataCallback) (void) ) {
   setConvMode (Continuous);
   setConvTime (C125mS);
   setAveraging (AVE8);
+  setAlertMode (Alert);
   //setMode (Data);
   newDataCallback = _newDataCallback;
 }
@@ -21,7 +22,7 @@ void      TMP117::setAllert (void (*allert_callback)(void), uint8_t pin) {
   alert_pin = pin;
   pinMode(pin, INPUT_PULLUP);
    
-  attachInterrupt(digitalPinToInterrupt(pin), allert_callback, CHANGE); // Sets up pin 2 to trigger "alert" ISR when pin changes H->L and L->H
+  attachInterrupt(digitalPinToInterrupt(pin), allert_callback, FALLING ); // Sets up pin 2 to trigger "alert" ISR when pin changes H->L and L->H
 }
 
 void      TMP117::setAllertTemperature (double lowtemp, double hightemp) {
@@ -30,7 +31,6 @@ void      TMP117::setAllertTemperature (double lowtemp, double hightemp) {
  const uint8_t highlimL = B10000000;   // Low byte of high lim  - High 27 C
  const uint8_t lowlimH = B00001100;    // High byte of low lim
  const uint8_t lowlimL = B00000000;    // Low byte of low lim   - Low 24 C
-
 
  uint16_t high_temp_value = ((highlimH << 8) | highlimL);
  uint16_t low_temp_value = ((lowlimH << 8) | lowlimL);
@@ -45,8 +45,8 @@ uint16_t  TMP117::readConfig (void) {
   uint16_t reg_value = i2cRead2B ( TMP117_REG_CONFIGURATION );
   bool high_alert = reg_value >> 15 & 1UL;
   bool low_alert = reg_value >> 14 & 1UL;   
-  bool data_ready =  reg_value >> 13 & 1UL;   
-  bool eeprom_busy =  reg_value >> 12 & 1UL;   
+  bool data_ready = reg_value >> 13 & 1UL;   
+  bool eeprom_busy = reg_value >> 12 & 1UL;   
 
   if (data_ready && newDataCallback != NULL)
     newDataCallback ();
@@ -61,7 +61,7 @@ uint16_t  TMP117::readConfig (void) {
     alert_type = NoAlert;
   }
   
-  printConfig ( reg_value );
+  //printConfig ( reg_value );
     
   return reg_value;  
 }
@@ -126,7 +126,7 @@ void      TMP117::setAveraging ( TMP117_AVE ave ) {
 void      TMP117::writeConfig (uint16_t config_data) {
   i2cWrite2B (TMP117_REG_CONFIGURATION, config_data);
 }
-void      TMP117::setMode ( TMP117_MODE mode) {
+void      TMP117::setAlertMode ( TMP117_MODE mode) {
   uint16_t reg_value = readConfig ();
   if (mode == Thermal) {
     reg_value |= 1UL << 4;    // change to thermal mode
@@ -187,7 +187,6 @@ uint16_t  TMP117::getDeviceID (void) {
   return (raw & 0x0fff);
 }
 
-
 void      TMP117::writeEEPROM (uint16_t data, uint8_t eeprom) {
   if (!EEPROMisBusy()) {
     unlockEEPROM();
@@ -219,22 +218,21 @@ uint16_t  TMP117::readEEPROM (uint8_t eeprom) {
     Serial.println("EEPROM is busy");
   }
 }
-
-void TMP117::lockEEPROM (void) {
+void      TMP117::lockEEPROM (void) {
   // clear bit 15
   uint16_t code = 0;
   code &= ~(1UL << 15);
   i2cWrite2B ( TMP117_REG_EEPROM_UNLOCK, code );
   delay(100);
 }
-void TMP117::unlockEEPROM (void) {
+void      TMP117::unlockEEPROM (void) {
   // set bit 15
   uint16_t code = 0;
   code |= 1UL << 15;
   i2cWrite2B ( TMP117_REG_EEPROM_UNLOCK, code );
   delay(100);
 }
-bool TMP117::EEPROMisBusy (void) {
+bool      TMP117::EEPROMisBusy (void) {
   // Bit 14 indicates the busy state of the eeprom
   uint16_t code = i2cRead2B ( TMP117_REG_EEPROM_UNLOCK );
   return false;//(bool) ((code >> 14) & 0x01);

@@ -3,22 +3,28 @@
 
 
 TMP117::TMP117 (uint8_t addr) {
-  
+  Wire.begin();
+
   address = addr;
-  allert_pin = -1;
-  //Wire.begin();
+  alert_pin = -1;
+  alert_type = NoAlert;
+}
+void TMP117::init ( void (*_newDataCallback) (void) ) {
+  setConvMode (Continuous);
+  setConvTime (C125mS);
+  setAveraging (AVE8);
+  //setMode (Data);
+  newDataCallback = _newDataCallback;
 }
 
-void TMP117::setAllert (void (*allert_callback)(void), uint8_t pin) {
-  allert_pin = pin;
+void      TMP117::setAllert (void (*allert_callback)(void), uint8_t pin) {
+  alert_pin = pin;
   pinMode(pin, INPUT_PULLUP);
-  setConvMode (OneShot);
-  //setMode (Data);
-  
+   
   attachInterrupt(digitalPinToInterrupt(pin), allert_callback, CHANGE); // Sets up pin 2 to trigger "alert" ISR when pin changes H->L and L->H
 }
 
-void TMP117::setAllertTemperature (double lowtemp, double hightemp) {
+void      TMP117::setAllertTemperature (double lowtemp, double hightemp) {
    // Set temperature threshold 
  const uint8_t highlimH = B00001101;   // High byte of high lim
  const uint8_t highlimL = B10000000;   // Low byte of high lim  - High 27 C
@@ -26,57 +32,101 @@ void TMP117::setAllertTemperature (double lowtemp, double hightemp) {
  const uint8_t lowlimL = B00000000;    // Low byte of low lim   - Low 24 C
 
 
- //uint16_t high_temp_value = ((highlimH << 8) | highlimL);
- //uint16_t low_temp_value = ((lowlimH << 8) | lowlimL);
+ uint16_t high_temp_value = ((highlimH << 8) | highlimL);
+ uint16_t low_temp_value = ((lowlimH << 8) | lowlimL);
 
- uint16_t high_temp_value = hightemp / TMP117_RESOLUTION;
- uint16_t low_temp_value = lowtemp / TMP117_RESOLUTION;
+ //uint16_t high_temp_value = hightemp / TMP117_RESOLUTION;
+ //uint16_t low_temp_value = lowtemp / TMP117_RESOLUTION;
 
  i2cWrite2B (TMP117_REG_TEMP_HIGH_LIMIT , high_temp_value);
  i2cWrite2B (TMP117_REG_TEMP_LOW_LIMIT , low_temp_value);  
 }
-
-uint16_t TMP117::readConfig (void) {
+uint16_t  TMP117::readConfig (void) {
   uint16_t reg_value = i2cRead2B ( TMP117_REG_CONFIGURATION );
   bool high_alert = reg_value >> 15 & 1UL;
   bool low_alert = reg_value >> 14 & 1UL;   
   bool data_ready =  reg_value >> 13 & 1UL;   
   bool eeprom_busy =  reg_value >> 12 & 1UL;   
 
-  if (data_ready)
-    Serial.println(reg_value, BIN);
+  if (data_ready && newDataCallback != NULL)
+    newDataCallback ();
+
+  if (reg_value >> 15 & 1UL) {
+    alert_type = HighTempAlert;
+  }
+  else if (reg_value >> 14 & 1UL) {
+    alert_type = LowTempAlert;
+  }
+  else {
+    alert_type = NoAlert;
+  }
+  
+  printConfig ( reg_value );
+    
   return reg_value;  
 }
+TMP117_ALERT TMP117::getAlertType ( void ) {
+  return alert_type;
+}
+void      TMP117::printConfig (uint16_t reg_value) {
 
-void TMP117::setConvMode ( TMP117_CMODE cmode) {
+  Serial.println(reg_value, BIN);
+
+  Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+  Serial.print ("HIGH alert:  ");
+  Serial.println( ( reg_value >> 15) & 0b1 , BIN);
+  Serial.print ("LOW alert:   ");
+  Serial.println( ( reg_value >> 14) & 0b1 , BIN);
+  Serial.print ("Data ready:  ");
+  Serial.println( ( reg_value >> 13) & 0b1 , BIN);
+  Serial.print ("EEPROM busy: ");
+  Serial.println( ( reg_value >> 12) & 0b1 , BIN);
+  Serial.print ("MOD[1:0]:    ");
+  Serial.println( ( reg_value >> 10) & 0b11 , BIN);
+  Serial.print ("CONV[2:0]:   ");
+  Serial.println( ( reg_value >> 7)  & 0b111 , BIN);
+  Serial.print ("AVG[1:0]:    ");
+  Serial.println( ( reg_value >> 5)  & 0b11 , BIN);
+  Serial.print ("T/nA:        ");
+  Serial.println( ( reg_value >> 4) & 0b1 , BIN);
+  Serial.print ("POL:         ");
+  Serial.println( ( reg_value >> 3) & 0b1 , BIN);
+  Serial.print ("DR/Alert:    ");
+  Serial.println( ( reg_value >> 2) & 0b1 , BIN);
+  Serial.print ("Soft_Reset:  ");
+  Serial.println( ( reg_value >> 1) & 0b1 , BIN);
+}
+void      TMP117::setConvMode ( TMP117_CMODE cmode) {
    uint16_t reg_value = readConfig ();
-  
-   if (cmode == Continuous) {      // Bit [11:10] = 00
-      reg_value &= ~(1UL << 11); 
-      reg_value &= ~(1UL << 10);
-   } else if (cmode == Shutdown) { // Bit [11:10] = 01
-      reg_value &= ~(1UL << 11);
-      reg_value |= 1UL << 10;
-   } else if (cmode == OneShot) {  // Bit [11:10] = 11  
-      //reg_value |= 1UL << 11;
-      //reg_value |= 1UL << 10;
-      bitSet (reg_value , 11);
-      bitSet (reg_value , 10);
-   }
+   reg_value &= ~((1UL << 11) | (1UL << 10));       // clear bits
+   reg_value = reg_value | ( cmode  & 0x03 ) << 10; // set bits
+   
+   /*if (cmode == Continuous) {      
+      reg_value &= ~((1UL << 11) | (1UL << 10));        // Bit [11:10] = 00
+   } else if (cmode == Shutdown) { 
+      reg_value = (reg_value & ~(1 << 11)) | (1 << 10); // Bit [11:10] = 01
+   } else if (cmode == OneShot) {  
+      reg_value |= (1 << 11) | (1 << 10);               // Bit [11:10] = 11   
+   }    */
    
    writeConfig ( reg_value );
 }
-void TMP117::setConvTime ( TMP117_CONVT convtime ) {
-  
+void      TMP117::setConvTime ( TMP117_CONVT convtime ) {
+  uint16_t reg_value = readConfig ();
+  reg_value &= ~((1UL << 9) | (1UL << 8) | (1UL << 7));       // clear bits
+  reg_value = reg_value | ( convtime  & 0x07 ) << 7;          // set bits
+  writeConfig ( reg_value );
 }
-void TMP117::setAveraging ( TMP117_AVE ave ) {
-  
+void      TMP117::setAveraging ( TMP117_AVE ave ) {
+  uint16_t reg_value = readConfig ();
+  reg_value &= ~((1UL << 6) | (1UL << 5) );       // clear bits
+  reg_value = reg_value | ( ave & 0x03 ) << 5;          // set bits
+  writeConfig ( reg_value );
 }
-
-void TMP117::writeConfig (uint16_t config_data) {
+void      TMP117::writeConfig (uint16_t config_data) {
   i2cWrite2B (TMP117_REG_CONFIGURATION, config_data);
 }
-void TMP117::setMode ( TMP117_MODE mode) {
+void      TMP117::setMode ( TMP117_MODE mode) {
   uint16_t reg_value = readConfig ();
   if (mode == Thermal) {
     reg_value |= 1UL << 4;    // change to thermal mode
@@ -93,17 +143,15 @@ void TMP117::setMode ( TMP117_MODE mode) {
   } 
   writeConfig ( reg_value );
 }
-
-void TMP117::i2cWrite2B (uint8_t reg, uint16_t data){
+void      TMP117::i2cWrite2B (uint8_t reg, uint16_t data){
   Wire.beginTransmission(address); 
   Wire.write( reg );
-  Wire.write( (data<<8) );
+  Wire.write( (data>>8) );
   Wire.write( (data&0xff) );
   Wire.endTransmission( );
   delay(10);
 }
-
-uint16_t TMP117::i2cRead2B (uint8_t reg) {
+uint16_t  TMP117::i2cRead2B (uint8_t reg) {
   uint8_t data[2] = {0}; 
   int16_t datac = 0;   
 
@@ -120,16 +168,13 @@ uint16_t TMP117::i2cRead2B (uint8_t reg) {
   }
   return datac;
 }
-
-double TMP117::calcTemperature (uint16_t raw) {
+double    TMP117::calcTemperature (uint16_t raw) {
   return raw * TMP117_RESOLUTION;
 }
-
-double TMP117::getTemperature (void) {
+double    TMP117::getTemperature (void) {
   uint16_t temp = i2cRead2B( TMP117_REG_TEMPERATURE );
   return calcTemperature ( temp );
 }
-
 uint16_t  TMP117::getDeviceRev (void) {
   // read bits [15:12]
   uint16_t raw = i2cRead2B( TMP117_REG_DEVICE_ID );
@@ -139,12 +184,11 @@ uint16_t  TMP117::getDeviceRev (void) {
 uint16_t  TMP117::getDeviceID (void) {
   // read bits [11:0]
   uint16_t raw = i2cRead2B( TMP117_REG_DEVICE_ID );
-  
   return (raw & 0x0fff);
 }
 
 
-void TMP117::writeEEPROM (uint16_t data, uint8_t eeprom) {
+void      TMP117::writeEEPROM (uint16_t data, uint8_t eeprom) {
   if (!EEPROMisBusy()) {
     unlockEEPROM();
       switch (eeprom) {

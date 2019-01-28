@@ -14,6 +14,7 @@ void TMP117::init ( void (*_newDataCallback) (void) ) {
   setConvTime (C125mS);
   setAveraging (AVE8);
   setAlertMode (Alert);
+  //setOffsetTemperature(10);   // minus geht nicht?
   //setMode (Data);
   newDataCallback = _newDataCallback;
 }
@@ -26,17 +27,9 @@ void      TMP117::setAllert (void (*allert_callback)(void), uint8_t pin) {
 }
 
 void      TMP117::setAllertTemperature (double lowtemp, double hightemp) {
-   // Set temperature threshold 
- const uint8_t highlimH = B00001101;   // High byte of high lim
- const uint8_t highlimL = B10000000;   // Low byte of high lim  - High 27 C
- const uint8_t lowlimH = B00001100;    // High byte of low lim
- const uint8_t lowlimL = B00000000;    // Low byte of low lim   - Low 24 C
-
- uint16_t high_temp_value = ((highlimH << 8) | highlimL);
- uint16_t low_temp_value = ((lowlimH << 8) | lowlimL);
-
- //uint16_t high_temp_value = hightemp / TMP117_RESOLUTION;
- //uint16_t low_temp_value = lowtemp / TMP117_RESOLUTION;
+  
+ uint16_t high_temp_value = hightemp / TMP117_RESOLUTION;
+ uint16_t low_temp_value = lowtemp / TMP117_RESOLUTION;
 
  i2cWrite2B (TMP117_REG_TEMP_HIGH_LIMIT , high_temp_value);
  i2cWrite2B (TMP117_REG_TEMP_LOW_LIMIT , low_temp_value);  
@@ -95,6 +88,15 @@ void      TMP117::printConfig (uint16_t reg_value) {
   Serial.println( ( reg_value >> 2) & 0b1 , BIN);
   Serial.print ("Soft_Reset:  ");
   Serial.println( ( reg_value >> 1) & 0b1 , BIN);
+}
+void      TMP117::setOffsetTemperature ( double offset ) {
+  uint16_t offset_temp_value = offset / TMP117_RESOLUTION;
+  i2cWrite2B (TMP117_REG_TEMPERATURE_OFFSET , offset_temp_value);
+}
+void      TMP117::setTargetTemperature ( double target ) {
+  double actual_temp = getTemperature ( );
+  double delta_temp =  target - actual_temp;
+  setOffsetTemperature ( delta_temp );
 }
 void      TMP117::setConvMode ( TMP117_CMODE cmode) {
    uint16_t reg_value = readConfig ();

@@ -58,18 +58,24 @@ class TMP117 {
   public:
               TMP117 (uint8_t addr);
     void      init ( void (*_newDataCallback) (void) );
-    double    getTemperature (void);
-    uint16_t  getDeviceID (void);
-    uint16_t  getDeviceRev (void);
-    void      writeEEPROM (uint16_t data, uint8_t eeprom);
-    uint16_t  readEEPROM (uint8_t eeprom);
-    void      setAllert (void (*allert_callback)(void), uint8_t pin);
-    void      setAllertTemperature (double lowtemp, double hightemp);
-    uint16_t  readConfig (void);
+    
     void      setAlertMode ( TMP117_MODE mode);
     void      setConvMode ( TMP117_CMODE cmode);
     void      setConvTime ( TMP117_CONVT convtime );
     void      setAveraging ( TMP117_AVE ave );
+    void      setAllert (void (*allert_callback)(void), uint8_t pin);
+    void      setAllertTemperature ( double lowtemp, double hightemp );
+    void      setOffsetTemperature ( double offset );
+    void      setTargetTemperature ( double target );
+    
+    double    getTemperature (void);
+    uint16_t  getDeviceID (void);
+    uint16_t  getDeviceRev (void);
+   
+    void      writeEEPROM (uint16_t data, uint8_t eeprom);
+    uint16_t  readEEPROM (uint8_t eeprom);
+    uint16_t  readConfig (void);
+
     TMP117_ALERT getAlertType ( void );
 
   private:

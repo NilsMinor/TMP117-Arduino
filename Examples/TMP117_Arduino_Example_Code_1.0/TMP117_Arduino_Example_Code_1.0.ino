@@ -20,7 +20,7 @@ void setup() {
   pinMode (13, OUTPUT); 
 
   t.setAllert ( temperature_allert, 7);
-  t.setAllertTemperature (24, 28);
+  //t.setAllertTemperature (24, 28);
   t.init ( new_temperature );
 }
 
@@ -42,23 +42,17 @@ void new_temperature ( void ) {
 }
 
 void temperature_allert (void) {
-  Serial.println ("ALERT");
-
+ 
   if (t.getAlertType () == HighTempAlert) {
     digitalWrite (13, HIGH);
-    Serial.print ("High Temperature allert : ");
-    Serial.print (t.getTemperature());
-    Serial.println (" °C");
+    Serial.println ("High Temperature allert ");
   }
   else if (t.getAlertType () == LowTempAlert) {
     digitalWrite (13, HIGH);
-    Serial.print ("Low Temperature allert : ");
-    Serial.print (t.getTemperature());
-    Serial.println (" °C");
+    Serial.println ("Low Temperature allert ");
   }
   else {
     digitalWrite (13, LOW);
   }
   
-
 }

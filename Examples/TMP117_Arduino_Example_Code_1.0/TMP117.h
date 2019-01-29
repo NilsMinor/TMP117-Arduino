@@ -1,8 +1,20 @@
 
 /*
- * Arduino library for TMP117 temperature sensor. Based on TI training resources https://training.ti.com/how-interface-tmp116-tmp117-temperature-sensors-arduino 
+ * Arduino library for TMP117 high-precision digital temperature sensor.
  * 
- * datasheet http://www.ti.com/lit/ds/symlink/tmp117.pdf
+ * Features:
+ *  - meet ASTM E1112 and ISO 80601 requirements 
+ *  - serve as a single chip digital alternative to a Platinum RTD (Class AA RTD)
+ *  - 100% tested on a production setup that is NIST traceable
+ *  
+ *  - ±0.1°C (Maximum) From –20°C to +50°C
+ *  - ±0.15°C (Maximum) From –40°C to +70°C
+ *  - ±0.2°C (Maximum) From –40°C to +100°C
+ *  - ±0.25°C (Maximum) From –55°C to +125°C
+ *  - ±0.3°C (Maximum) From –55°C to +150°C
+ *  -Low Power Consumption 3.5-µA, 1-Hz Conversion Cycle
+ *  
+ * Datasheet http://www.ti.com/lit/ds/symlink/tmp117.pdf
  * 
  * 
  * EEPROM is ordered like a 64 bit number 

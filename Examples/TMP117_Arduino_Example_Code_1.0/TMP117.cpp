@@ -20,7 +20,7 @@ TMP117::TMP117 (uint8_t addr) {
   
   address = addr;
   alert_pin = -1;
-  alert_type = NoAlert;
+  alert_type = NOALERT;
   newDataCallback = NULL;
 }
 
@@ -29,11 +29,10 @@ TMP117::TMP117 (uint8_t addr) {
     @param   _newDataCallback   callback function will be called when new data is available
 */
 void TMP117::init ( void (*_newDataCallback) (void) ) {
-  setConvMode (Continuous);
+  setConvMode (CONTINUOS);
   setConvTime (C125mS);
   setAveraging (AVE8);
-  setMode (Thermal);
-  setAlertMode (Alert);
+  setAlertMode (THERMAL);
   setOffsetTemperature(0);    
   
   newDataCallback = _newDataCallback;
@@ -63,17 +62,17 @@ void TMP117::softReset ( void ) {
 */
 void      TMP117::setAlertMode ( TMP117_PMODE mode) {
   uint16_t reg_value = readConfig ();
-  if (mode == Thermal) {
+  if (mode == THERMAL) {
     reg_value |= 1UL << 4;    // change to thermal mode
     reg_value &= ~(1UL << 2); // set pin as alert flag
     reg_value &= ~(1UL << 3); // alert pin low active
   }
-  else if (mode == Alert) {
+  else if (mode == ALERT) {
     reg_value &= ~(1UL << 4); // change to alert mode
     reg_value &= ~(1UL << 2); // set pin as alert flag
     reg_value &= ~(1UL << 3); // alert pin low active
   } 
-  else if (mode == Data) {
+  else if (mode == DATA) {
     reg_value |= 1UL << 2;    // set pin as data ready flag
   } 
   writeConfig ( reg_value );
@@ -178,13 +177,13 @@ uint16_t  TMP117::readConfig (void) {
     newDataCallback ();
 
   if (reg_value >> 15 & 1UL) {
-    alert_type = HighTempAlert;
+    alert_type = HIGHALERT;
   }
   else if (reg_value >> 14 & 1UL) {
-    alert_type = LowTempAlert;
+    alert_type = LOWALERT;
   }
   else {
-    alert_type = NoAlert;
+    alert_type = NOALERT;
   }
   
   //printConfig ( reg_value );
@@ -243,7 +242,6 @@ double    TMP117::getOffsetTemperature (void) {
   return  (temp * TMP117_RESOLUTION);
 }
 
-
 /*!
     @brief    Write data to EEPROM register
     
@@ -254,7 +252,7 @@ double    TMP117::getOffsetTemperature (void) {
 void      TMP117::writeEEPROM (uint16_t data, uint8_t eeprom_nr) {
   if (!EEPROMisBusy()) {
     unlockEEPROM();
-      switch (eeprom) {
+      switch (eeprom_nr) {
         case 1 : i2cWrite2B ( TMP117_REG_EEPROM1, data); break;
         case 2 : i2cWrite2B ( TMP117_REG_EEPROM2, data); break;
         case 3 : i2cWrite2B ( TMP117_REG_EEPROM3, data); break;

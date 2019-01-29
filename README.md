@@ -25,6 +25,7 @@ This library exposes it's functionality using the wire library for I2C communica
 - [X] Read from internal EEPROM
 - [x] Make configuration accessible
 - [x] Implement allert function (HIGH/LOW temperature allerts) 
-- [ ] Write to internal EEPROM
-- [ ] Implement temperature offset function
- 
+- [x] Read/write from/to internal EEPROM
+- [x] Implement temperature offset and calibration function
+- [x] Implement software callbacks if new data/temperature is available
+  

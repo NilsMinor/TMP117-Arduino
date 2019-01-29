@@ -49,11 +49,11 @@ void new_temperature ( void ) {
 
 void temperature_allert (void) {
  
-  if (t.getAlertType () == HighTempAlert) {
+  if (t.getAlertType () == HIGHALERT) {
     digitalWrite (13, HIGH);
     Serial.println ("High Temperature allert ");
   }
-  else if (t.getAlertType () == LowTempAlert) {
+  else if (t.getAlertType () == LOWALERT) {
     digitalWrite (13, HIGH);
     Serial.println ("Low Temperature allert ");
   }

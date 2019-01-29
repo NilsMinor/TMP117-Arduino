@@ -63,11 +63,11 @@ typedef void (*allert_callback)(void);
         7             16s     16s     16s      16s    C16S
 */
 
-enum TMP117_PMODE     {Thermal = 0, Alert, Data};                                 //!<  Pin mode 
-enum TMP117_CMODE     {Continuous = 0, Shutdown = 1, OneShot = 3};                //!<  Conversion mode 
+enum TMP117_PMODE     {THERMAL = 0, ALERT, DATA};                                 //!<  Pin mode 
+enum TMP117_CMODE     {CONTINUOS = 0, SHUTDOWN = 1, ONESHOT = 3};                 //!<  Conversion mode 
 enum TMP117_CONVT     {C15mS5 = 0, C125mS, C250mS, C500mS, C1S, C4S, C8S, C16S};  //!<  Conversion time
 enum TMP117_AVE       {NOAVE = 0, AVE8, AVE32, AVE64};                            //!<  Averaging mode
-enum TMP117_ALERT     {NoAlert = 0, HighTempAlert, LowTempAlert};                 //!<  Pin mode 
+enum TMP117_ALERT     {NOALERT = 0, HIGHALERT, LOWALERT};                         //!<  Alert type 
 
 class TMP117 {
 
@@ -95,10 +95,9 @@ class TMP117 {
     void      writeEEPROM ( uint16_t data, uint8_t eeprom_nr );
     uint16_t  readEEPROM ( uint8_t eeprom_nr );
     uint16_t  readConfig ( void );
-    
-
+   
   private:
-
+  
     uint8_t   address;
     int8_t    alert_pin;
     TMP117_ALERT alert_type;

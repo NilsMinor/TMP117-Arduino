@@ -1,0 +1,63 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+TMP117	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+TMP117	KEYWORD2
+init	KEYWORD2
+update	KEYWORD2
+softReset	KEYWORD2
+setAlertMode    KEYWORD2
+setAllertCallback   KEYWORD2
+setAllertTemperature    KEYWORD2
+setConvMode KEYWORD2
+setConvTime KEYWORD2
+setAveraging    KEYWORD2
+setOffsetTemperature    KEYWORD2
+setTargetTemperature    KEYWORD2
+getTemperature  KEYWORD2
+getDeviceID KEYWORD2
+getDeviceRev    KEYWORD2
+getOffsetTemperature    KEYWORD2
+getAlertType    KEYWORD2
+writeEEPROM KEYWORD2
+readEEPROM  KEYWORD2
+readConfig  KEYWORD2
+
+######################################
+# Constants (LITERAL1)
+#######################################
+THERMAL LITERAL1
+ALERT   LITERAL1
+DATA    LITERAL1
+CONTINUOS   LITERAL1
+SHUTDOWN    LITERAL1
+ONESHOT LITERAL1
+C15mS5  LITERAL1
+C125mS  LITERAL1
+C250mS  LITERAL1
+C500mS  LITERAL1
+C1S LITERAL1
+C4S LITERAL1
+C8S LITERAL1
+C16S    LITERAL1
+NOAVE   LITERAL1
+AVE8    LITERAL1
+AVE32   LITERAL1
+AVE64   LITERAL1
+NOALERT LITERAL1
+HIGHALERT   LITERAL1
+LOWALERT    LITERAL1
+
+
+
+
+

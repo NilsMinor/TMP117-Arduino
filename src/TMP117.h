@@ -29,8 +29,8 @@
 #ifndef _TMP117_H_
 #define _TMP117_H_
 
-#include "Wire.h"
-#include "Arduino.h"
+#include <Wire.h>
+#include <Arduino.h>
 
 #define TMP117_REG_TEMPERATURE          0x00
 #define TMP117_REG_CONFIGURATION        0x01
@@ -64,7 +64,7 @@ typedef void (*allert_callback)(void);
 */
 
 enum TMP117_PMODE     {THERMAL = 0, ALERT, DATA};                                 //!<  Pin mode 
-enum TMP117_CMODE     {CONTINUOS = 0, SHUTDOWN = 1, ONESHOT = 3};                 //!<  Conversion mode 
+enum TMP117_CMODE     {CONTINUOUS = 0, SHUTDOWN = 1, ONESHOT = 3};                //!<  Conversion mode 
 enum TMP117_CONVT     {C15mS5 = 0, C125mS, C250mS, C500mS, C1S, C4S, C8S, C16S};  //!<  Conversion time
 enum TMP117_AVE       {NOAVE = 0, AVE8, AVE32, AVE64};                            //!<  Averaging mode
 enum TMP117_ALERT     {NOALERT = 0, HIGHALERT, LOWALERT};                         //!<  Alert type 

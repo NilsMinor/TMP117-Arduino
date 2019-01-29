@@ -29,10 +29,10 @@ TMP117::TMP117 (uint8_t addr) {
     @param   _newDataCallback   callback function will be called when new data is available
 */
 void TMP117::init ( void (*_newDataCallback) (void) ) {
-  setConvMode (CONTINUOS);
+  setConvMode (CONTINUOUS);
   setConvTime (C125mS);
   setAveraging (AVE8);
-  setAlertMode (THERMAL);
+  setAlertMode (DATA);
   setOffsetTemperature(0);    
   
   newDataCallback = _newDataCallback;
@@ -108,7 +108,7 @@ void      TMP117::setAllertTemperature (double lowtemp, double hightemp) {
 /*!
     @brief    Set conversion mode
     
-    @param    cmode   ::TMP117_CMODE [Continuous-Shutdown-Oneshot]
+    @param    cmode   ::TMP117_CMODE [CONTINUOUS-SHUTDOWN-ONESHOT]
 */
 void      TMP117::setConvMode ( TMP117_CMODE cmode) {
    uint16_t reg_value = readConfig ();

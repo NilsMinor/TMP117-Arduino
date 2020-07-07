@@ -286,6 +286,7 @@ uint16_t  TMP117::readEEPROM (uint8_t eeprom_nr) {
   }
   else {
     Serial.println("EEPROM is busy");
+    return 0;
   }
 }
 

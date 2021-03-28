@@ -29,7 +29,7 @@ void setup() {
   Serial.begin(115200);
 
   /* The default setup is :
-   *    Conversion mode = CONTINUOUS  ---> continuoss
+   *    Conversion mode = CONTINUOUS  ---> continuous
    *    Conversion time = C125mS      -|
    *    Averaging mode  = AVE8        -|-> new data every 125mS
    *    Alert mode      = data        ---> alert pin states that new data is available

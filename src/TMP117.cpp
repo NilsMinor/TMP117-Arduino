@@ -167,11 +167,15 @@ void      TMP117::setTargetTemperature ( double target ) {
     @return   uint16_t  read value of the configuration regsiter          
 */
 uint16_t  TMP117::readConfig (void) {
-  uint16_t reg_value = i2cRead2B ( TMP117_REG_CONFIGURATION );
-  bool high_alert = reg_value >> 15 & 1UL;
-  bool low_alert = reg_value >> 14 & 1UL;   
+  uint16_t reg_value = i2cRead2B ( TMP117_REG_CONFIGURATION );  
   bool data_ready = reg_value >> 13 & 1UL;   
-  bool eeprom_busy = reg_value >> 12 & 1UL;   
+
+  // following bits are a comment in order to not create compiler warnings 
+  // but might be used in the future for some purpose 
+  // bool eeprom_busy = reg_value >> 12 & 1UL;
+  // bool high_alert = reg_value >> 15 & 1UL; 
+  // bool low_alert = reg_value >> 14 & 1UL;    
+
 
   if (data_ready && newDataCallback != NULL)
     newDataCallback ();
@@ -324,7 +328,7 @@ uint16_t  TMP117::i2cRead2B (uint8_t reg) {
   Wire.beginTransmission(address); 
   Wire.write(reg); 
   Wire.endTransmission(); 
-  Wire.requestFrom(address, 2); 
+  Wire.requestFrom((uint8_t)address, (uint8_t)2); 
   if(Wire.available() <= 2){  
     data[0] = Wire.read(); 
     data[1] = Wire.read();  

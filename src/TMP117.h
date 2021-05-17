@@ -95,6 +95,7 @@ class TMP117 {
     void      writeEEPROM ( uint16_t data, uint8_t eeprom_nr );
     uint16_t  readEEPROM ( uint8_t eeprom_nr );
     uint16_t  readConfig ( void );
+    void      printConfig ( void );
    
   private:
   
@@ -105,7 +106,6 @@ class TMP117 {
     void      i2cWrite2B ( uint8_t reg, uint16_t data );
     uint16_t  i2cRead2B ( uint8_t reg );
     void      writeConfig ( uint16_t config_data );
-    void      printConfig ( uint16_t reg_value );
     void      lockEEPROM ( void );
     void      unlockEEPROM ( void );
     bool      EEPROMisBusy ( void );

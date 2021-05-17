@@ -338,12 +338,20 @@ uint16_t  TMP117::i2cRead2B (uint8_t reg) {
 }
 
 /*!
-    @brief    Write configuration to config register
+    @brief    Write configuration to config register.  Also store it
+              to the EEPROM so the settings will be used on reboot.
     
     @param    config_data  configuration
 */
 void      TMP117::writeConfig (uint16_t config_data) {
-  i2cWrite2B (TMP117_REG_CONFIGURATION, config_data);
+  if (!EEPROMisBusy()) {
+    unlockEEPROM();
+    i2cWrite2B (TMP117_REG_CONFIGURATION, config_data);
+    lockEEPROM();
+  }
+  else {
+    Serial.println("EEPROM is busy");
+  }
 }
 
 /*!
@@ -351,11 +359,10 @@ void      TMP117::writeConfig (uint16_t config_data) {
     
     @param    reg_value  configuration value
 */
-void      TMP117::printConfig (uint16_t reg_value) {
-
+void      TMP117::printConfig () {
+  uint16_t reg_value = i2cRead2B ( TMP117_REG_CONFIGURATION );
   Serial.println(reg_value, BIN);
 
-  Serial.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
   Serial.print ("HIGH alert:  ");
   Serial.println( ( reg_value >> 15) & 0b1 , BIN);
   Serial.print ("LOW alert:   ");

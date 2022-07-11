@@ -20,7 +20,7 @@ TMP117::TMP117 (uint8_t addr) {
   
   address = addr;
   alert_pin = -1;
-  alert_type = NOALERT;
+  alert_type = TMP117_ALERT::NOALERT;
   newDataCallback = NULL;
 }
 
@@ -29,10 +29,10 @@ TMP117::TMP117 (uint8_t addr) {
     @param   _newDataCallback   callback function will be called when new data is available
 */
 void TMP117::init ( void (*_newDataCallback) (void) ) {
-  setConvMode (CONTINUOUS);
-  setConvTime (C125mS);
-  setAveraging (AVE8);
-  setAlertMode (DATA);
+  setConvMode (TMP117_CMODE::CONTINUOUS);
+  setConvTime (TMP117_CONVT::C125mS);
+  setAveraging (TMP117_AVE::AVE8);
+  setAlertMode (TMP117_PMODE::DATA);
   setOffsetTemperature(0);    
   
   newDataCallback = _newDataCallback;
@@ -62,17 +62,17 @@ void TMP117::softReset ( void ) {
 */
 void      TMP117::setAlertMode ( TMP117_PMODE mode) {
   uint16_t reg_value = readConfig ();
-  if (mode == THERMAL) {
+  if (mode == TMP117_PMODE::THERMAL) {
     reg_value |= 1UL << 4;    // change to thermal mode
     reg_value &= ~(1UL << 2); // set pin as alert flag
     reg_value &= ~(1UL << 3); // alert pin low active
   }
-  else if (mode == ALERT) {
+  else if (mode == TMP117_PMODE::ALERT) {
     reg_value &= ~(1UL << 4); // change to alert mode
     reg_value &= ~(1UL << 2); // set pin as alert flag
     reg_value &= ~(1UL << 3); // alert pin low active
   } 
-  else if (mode == DATA) {
+  else if (mode ==TMP117_PMODE:: DATA) {
     reg_value |= 1UL << 2;    // set pin as data ready flag
   } 
   writeConfig ( reg_value );
@@ -113,7 +113,7 @@ void      TMP117::setAllertTemperature (double lowtemp, double hightemp) {
 void      TMP117::setConvMode ( TMP117_CMODE cmode) {
    uint16_t reg_value = readConfig ();
    reg_value &= ~((1UL << 11) | (1UL << 10));       // clear bits
-   reg_value = reg_value | ( cmode  & 0x03 ) << 10; // set bits   
+   reg_value = reg_value | ( static_cast<int>(cmode)  & 0x03 ) << 10; // set bits   
    writeConfig ( reg_value );
 }
 
@@ -125,7 +125,7 @@ void      TMP117::setConvMode ( TMP117_CMODE cmode) {
 void      TMP117::setConvTime ( TMP117_CONVT convtime ) {
   uint16_t reg_value = readConfig ();
   reg_value &= ~((1UL << 9) | (1UL << 8) | (1UL << 7));       // clear bits
-  reg_value = reg_value | ( convtime  & 0x07 ) << 7;          // set bits
+  reg_value = reg_value | ( static_cast<int>(convtime)  & 0x07 ) << 7;          // set bits
   writeConfig ( reg_value );
 }
 /*!
@@ -136,7 +136,7 @@ void      TMP117::setConvTime ( TMP117_CONVT convtime ) {
 void      TMP117::setAveraging ( TMP117_AVE ave ) {
   uint16_t reg_value = readConfig ();
   reg_value &= ~((1UL << 6) | (1UL << 5) );       // clear bits
-  reg_value = reg_value | ( ave & 0x03 ) << 5;          // set bits
+  reg_value = reg_value | ( static_cast<int>(ave) & 0x03 ) << 5;          // set bits
   writeConfig ( reg_value );
 }
 
@@ -181,13 +181,13 @@ uint16_t  TMP117::readConfig (void) {
     newDataCallback ();
 
   if (reg_value >> 15 & 1UL) {
-    alert_type = HIGHALERT;
+    alert_type = TMP117_ALERT::HIGHALERT;
   }
   else if (reg_value >> 14 & 1UL) {
-    alert_type = LOWALERT;
+    alert_type = TMP117_ALERT::LOWALERT;
   }
   else {
-    alert_type = NOALERT;
+    alert_type = TMP117_ALERT::NOALERT;
   }
   
   //printConfig ( reg_value );

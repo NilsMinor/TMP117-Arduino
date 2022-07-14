@@ -34,14 +34,14 @@ void setup() {
   Serial.begin(115200);
 
   tmp.init ( new_temperature );     // set callback function. will be called if there is new sensor data
-  tmp.setConvMode (CONTINUOUS);     // contious measurement, also ONESHOT or SHUTWDOWN possible
+  tmp.setConvMode (TMP117_CMODE::CONTINUOUS);     // contious measurement, also ONESHOT or SHUTWDOWN possible
 
 
   tmp.init ( new_temperature );
-  tmp.setConvTime (C15mS5);         // 1. setup C125mS+NOAVE = 15.5 mS measurement time
-  tmp.setAveraging (NOAVE);
+  tmp.setConvTime (TMP117_CONVT::C15mS5);         // 1. setup C125mS+NOAVE = 15.5 mS measurement time
+  tmp.setAveraging (TMP117_AVE::NOAVE);
   
-  tmp.setAlertMode(ALERT);          // use THERMAL or ALERT to activate alert feature
+  tmp.setAlertMode(TMP117_PMODE::ALERT);          // use THERMAL or ALERT to activate alert feature
   tmp.setAllertCallback ( temperature_allert, ALERT_PIN );
   tmp.setAllertTemperature (LOW_TEMPERATURE_ALERT, HIGH_TEMPERATURE_ALERT);      
 }

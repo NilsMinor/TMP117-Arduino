@@ -37,10 +37,10 @@ void setup() {
   Serial.begin(115200);
 
   tmp.init ( NULL );                // no callback
-  tmp.setConvMode (CONTINUOUS);     // contious measurement, also ONESHOT or SHUTWDOWN possible
+  tmp.setConvMode (TMP117_CMODE::CONTINUOUS);     // contious measurement, also ONESHOT or SHUTWDOWN possible
 
-  tmp.setConvTime (C15mS5);         // 1. setup C125mS+NOAVE = 15.5 mS measurement time
-  tmp.setAveraging (NOAVE);     
+  tmp.setConvTime (TMP117_CONVT::C15mS5);         // 1. setup C125mS+NOAVE = 15.5 mS measurement time
+  tmp.setAveraging (TMP117_AVE::NOAVE);     
 }
 
 /************************* Infinite Loop Function **********************************/

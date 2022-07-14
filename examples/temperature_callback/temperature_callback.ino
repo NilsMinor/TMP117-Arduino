@@ -43,21 +43,21 @@ void setup() {
   pinMode (LED_BUILTIN, OUTPUT); 
 
   tmp.init ( new_temperature );     // set callback function. will be called if there is new sensor data
-  tmp.setConvMode (CONTINUOUS);     // contious measurement, also ONESHOT or SHUTWDOWN possible
+  tmp.setConvMode (TMP117_CMODE::CONTINUOUS);     // contious measurement, also ONESHOT or SHUTWDOWN possible
 
   uint8_t setup_nr = 3;             // select an example setup to see diffrent modes
   switch (setup_nr) {
-    case 1: tmp.setConvTime (C15mS5); // 1. setup C125mS+NOAVE = 15.5 mS measurement time
-            tmp.setAveraging (NOAVE);
+    case 1: tmp.setConvTime (TMP117_CONVT::C15mS5); // 1. setup C125mS+NOAVE = 15.5 mS measurement time
+            tmp.setAveraging (TMP117_AVE::NOAVE);
             break;
-    case 2: tmp.setConvTime (C125mS); // 2. setup C125mS+AVE8 = 125 mS measurement time
-            tmp.setAveraging (AVE8);
+    case 2: tmp.setConvTime (TMP117_CONVT::C125mS); // 2. setup C125mS+AVE8 = 125 mS measurement time
+            tmp.setAveraging (TMP117_AVE::AVE8);
             break;
-    case 3: tmp.setConvTime (C125mS); // 3. setup C500mS+AVE32 = 500 mS measurement time
-            tmp.setAveraging (AVE32);
+    case 3: tmp.setConvTime (TMP117_CONVT::C125mS); // 3. setup C500mS+AVE32 = 500 mS measurement time
+            tmp.setAveraging (TMP117_AVE::AVE32);
             break;
-    case 4: tmp.setConvTime (C4S);    // 4. setup C1S+AVE64 = 1000 mS measurement time
-            tmp.setAveraging (AVE64);
+    case 4: tmp.setConvTime (TMP117_CONVT::C4S);    // 4. setup C1S+AVE64 = 1000 mS measurement time
+            tmp.setAveraging (TMP117_AVE::AVE64);
             break;
     default: setup_nr = 1;
   }  

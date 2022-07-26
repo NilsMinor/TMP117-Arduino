@@ -63,11 +63,11 @@ typedef void (*allert_callback)(void);
         7             16s     16s     16s      16s    C16S
 */
 
-enum TMP117_PMODE     {THERMAL = 0, ALERT, DATA};                                 //!<  Pin mode 
-enum TMP117_CMODE     {CONTINUOUS = 0, SHUTDOWN = 1, ONESHOT = 3};                //!<  Conversion mode 
-enum TMP117_CONVT     {C15mS5 = 0, C125mS, C250mS, C500mS, C1S, C4S, C8S, C16S};  //!<  Conversion time
-enum TMP117_AVE       {NOAVE = 0, AVE8, AVE32, AVE64};                            //!<  Averaging mode
-enum TMP117_ALERT     {NOALERT = 0, HIGHALERT, LOWALERT};                         //!<  Alert type 
+enum class TMP117_PMODE     {THERMAL = 0, ALERT, DATA};                                 //!<  Pin mode 
+enum class TMP117_CMODE     {CONTINUOUS = 0, SHUTDOWN = 1, ONESHOT = 3};                //!<  Conversion mode 
+enum class TMP117_CONVT     {C15mS5 = 0, C125mS, C250mS, C500mS, C1S, C4S, C8S, C16S};  //!<  Conversion time
+enum class TMP117_AVE       {NOAVE = 0, AVE8, AVE32, AVE64};                            //!<  Averaging mode
+enum class TMP117_ALERT     {NOALERT = 0, HIGHALERT, LOWALERT};                         //!<  Alert type 
 
 class TMP117 {
 

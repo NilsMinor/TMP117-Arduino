@@ -52,12 +52,12 @@ void loop() {
   tmp.update();
 
   if (alert_flag) {
-    if (tmp.getAlertType () == HIGHALERT) {
+    if (tmp.getAlertType () == TMP117_ALERT::HIGHALERT) {
     Serial.print("High Temperature allert : ");
     Serial.print (tmp.getTemperature());
     Serial.println (" °C");
     }
-    else if (tmp.getAlertType () == LOWALERT) {
+    else if (tmp.getAlertType () == TMP117_ALERT::LOWALERT) {
       Serial.print("Low Temperature allert : ");
       Serial.print (tmp.getTemperature());
       Serial.println (" °C");
